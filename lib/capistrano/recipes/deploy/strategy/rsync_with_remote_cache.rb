@@ -44,7 +44,7 @@ module Capistrano
         end
         
         def rsync_command_for(server)
-          "rsync #{rsync_options} --rsh='ssh -p #{ssh_port(server)}' #{local_cache_path}/ #{rsync_host(server)}:#{repository_cache_path}/"
+          "rsync #{rsync_options} --rsh='ssh -p #{ssh_port(server)} #{identity_file_string}' #{local_cache_path}/ #{rsync_host(server)}:#{repository_cache_path}/"
         end
         
         def mark_local_cache
@@ -55,6 +55,10 @@ module Capistrano
           server.port || ssh_options[:port] || 22
         end
         
+        def identity_file_string
+          configuration[:identity_file] ? "-i #{identity_file}" : ""
+        end
+
         def local_cache_path
           File.expand_path(local_cache)
         end
