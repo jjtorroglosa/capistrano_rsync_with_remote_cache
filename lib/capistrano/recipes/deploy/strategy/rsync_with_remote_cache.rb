@@ -60,7 +60,7 @@ module Capistrano
         end
 
         def local_cache_path
-          File.expand_path(local_cache)
+          File.expand_path(local_cache + "/#{configuration[:application]}")
         end
         
         def repository_cache_path
