@@ -40,17 +40,25 @@ module Capistrano
         end
         
         def copy_remote_cache
-          run("rsync -a --delete #{repository_cache_path}/ #{configuration[:release_path]}/")
+          run("#{sudo_string_remote} rsync -a --delete #{repository_cache_path}/ #{configuration[:release_path]}/")
         end
         
         def rsync_command_for(server)
-          "rsync #{rsync_options} --rsh='ssh -p #{ssh_port(server)} #{identity_file_string}' #{local_cache_path}/ #{rsync_host(server)}:#{repository_cache_path}/"
+          "rsync #{rsync_options} #{sudo_string_local} --rsh='ssh -p #{ssh_port(server)} #{identity_file_string}' #{local_cache_path}/ #{rsync_host(server)}:#{repository_cache_path}/"
         end
         
         def mark_local_cache
           File.open(File.join(local_cache_path, 'REVISION'), 'w') {|f| f << revision }
         end
         
+        def sudo_string_local
+          configuration[:use_sudo] ? "--rsync-path='sudo rsync'" : ""
+        end
+
+        def sudo_string_remote
+          configuration[:use_sudo] ? "sudo" : ""
+        end
+
         def ssh_port(server)
           server.port || ssh_options[:port] || 22
         end
